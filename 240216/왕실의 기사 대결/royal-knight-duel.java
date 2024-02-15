@@ -2,16 +2,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
 
     static int L;
-    static int[][] map;
-    static int[][] knightMap;
-    static Knight[] knights;
+    static int[][] map;        //지도(함정, 벽)
+    static int[][] knightMap; //기사의 영역
+    static Knight[] knights; //기사들
     static int[][] delta = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}}; // y, x
 
     public static void main(String[] args) throws IOException {
@@ -28,13 +27,13 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < L; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
-                if (map[i][j] == 2) {
+                if (map[i][j] == 2) { //벽이면
                     knightMap[i][j] = -1;
                 }
             }
         }
 
-        //기사의 정보 초기화
+        //기사의 정보 초기화후 배치
         knights = new Knight[N + 1];
         for (int i = 1; i <= N; i++) {
             st = new StringTokenizer(br.readLine());
@@ -47,10 +46,6 @@ public class Main {
             knightMap[r][c] = i;
         }
 
-//        for (int i = 0; i < L; i++) {
-//            System.out.println(Arrays.toString(knightMap[i]));
-//        }
-
         //기사에게 명령 부여
         for (int i = 0; i < Q; i++) {
             st = new StringTokenizer(br.readLine());
@@ -60,23 +55,22 @@ public class Main {
 
             int dx = delta[dir][1];
             int dy = delta[dir][0];
-            List<Integer> willMoveKnightList = new ArrayList<>();
+            List<Integer> willMoveKnightList = new ArrayList<>(); //움직일 기사들의 번호들
             boolean isMove = knights[knightNum].isMove(knightMap, knights, visited, L, dx, dy, willMoveKnightList);
 
+            //모든 기사들이 움직일 수 있는 조건이라면
             if (isMove) {
+                //모든 기사들을 움직임
                 for (int willMoveKnightNum : willMoveKnightList) {
-                    knights[willMoveKnightNum].fight(knightMap, dx, dy);
+                    knights[willMoveKnightNum].move(knightMap, dx, dy);
                 }
 
+                //명령을 부여한 기사를 제외하고 움직인 후 영역에 트랩 개수만큼 데미지를 받음
                 for (int willMoveKnightNum : willMoveKnightList) {
                     if (willMoveKnightNum == knightNum) continue;
                     knights[willMoveKnightNum].attacked(knightMap, map);
                 }
             }
-//            for (int j = 0; j < L; j++) {
-//                System.out.println(Arrays.toString(knightMap[j]));
-//            }
-//            System.out.println(i);
         }
 
         int answer = 0;
@@ -84,7 +78,6 @@ public class Main {
             answer += knights[i].getDamage();
         }
         System.out.println(answer);
-//        System.out.println(2);
     }
 }
 
@@ -111,6 +104,7 @@ class Knight {
         }
     }
 
+    //생존한 기사의 데미지
     public int getDamage() {
         if (hp > 0) {
             return damage;
@@ -118,6 +112,7 @@ class Knight {
         return 0;
     }
 
+    //기사의 영역 내 트랩 수 만큼 데미지 받음
     public void attacked(int[][] knightMap, int[][] map) {
         int trapCnt = 0;
 
@@ -132,6 +127,7 @@ class Knight {
         hp -= trapCnt;
         damage += trapCnt;
 
+        //기사가 죽으면 영역에서 제외
         if (hp <= 0) {
             for (int i = y; i < y + h; i++) {
                 for (int j = x; j < x + w; j++) {
@@ -141,10 +137,8 @@ class Knight {
         }
     }
 
-    //밀쳐내기
-    public void fight(int[][] knightMap, int dx, int dy) {
-
-
+    //기사 움직이기
+    public void move(int[][] knightMap, int dx, int dy) {
         int ty = y + dy;
         int tx = x + dx;
 
@@ -167,10 +161,9 @@ class Knight {
 
     //기사가 이동 할 때 모든 다른 기사들이 움직일 수 있는지
     public boolean isMove(int[][] knightMap, Knight[] knights, boolean[] visited, int L, int dx, int dy, List<Integer> willMoveKnightList) {
-        if (hp <= 0) {
+        if (hp <= 0) { //기사가 죽어있다면 패스
             return false;
         }
-
 
         visited[n] = true;
         int ty = y + dy;
@@ -178,17 +171,25 @@ class Knight {
 
         for (int i = ty; i < ty + h; i++) {
             for (int j = tx; j < tx + w; j++) {
+                //기사가 움직일 곳이 지도를 벗어나거나 벽이 있다면
                 if (invalidRange(L, i, j) || isWall(knightMap, i, j)) {
                     return false;
                 }
+                //0은 빈 곳이므로 패스
                 if (knightMap[i][j] == 0) {
                     continue;
                 }
-                if (!visited[knightMap[i][j]] && !knights[knightMap[i][j]].isMove(knightMap, knights, visited, L, dx, dy, willMoveKnightList)) {
+                //기사가 움직일 곳에 다른 기사가 있는데, 그 기사가 isMove()에 만족하지 않으면(재귀)
+                if (!visited[knightMap[i][j]] &&
+                    !knights[knightMap[i][j]].isMove(knightMap, knights, visited, L, dx, dy, willMoveKnightList))
+                {
                     return false;
                 }
             }
         }
+
+        //제일 끝에 있는 기사의 번호부터 추가
+        //앞에부터 넣으면 이동시 앞 기사의 번호가 삭제됨
         willMoveKnightList.add(n);
         return true;
     }
