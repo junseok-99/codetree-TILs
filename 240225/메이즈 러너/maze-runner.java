@@ -41,6 +41,7 @@ public class Main {
                 map[y][x].addParticipant(i);
             }
         }
+
         //미로 탈출 시작
         while (K-- > 0) {
             move(); //참가자를 이동시킬 수 있으면 이동시킴
@@ -140,7 +141,6 @@ public class Main {
                         int willMoveDist = getDistance(ty, tx); //이동했을 때의 위치에서 출구까지의 거리
                         if (willMoveDist > curDist) continue;
 
-
                         moveFlag = true;
                         while (!map[i][j].isEmpty()) {
                             ++distSum;
@@ -151,7 +151,9 @@ public class Main {
                         break;
                     }
                     if (!moveFlag) { //참가자가 움직이지 않았다면
-                        copyMap[i][j] = map[i][j];
+                        while (!map[i][j].isEmpty()) {
+                            copyMap[i][j].add(map[i][j].poll());
+                        }
                     }
                 }
             }
