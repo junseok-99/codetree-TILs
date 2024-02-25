@@ -33,9 +33,8 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             int y = Integer.parseInt(st.nextToken());
             int x = Integer.parseInt(st.nextToken());
-            Point p = new Point(y, x);
             if (i == M) { //출구
-                exitP = p;
+                exitP = new Point(y, x);
                 map[y][x] = new Maps(11);
             }
             else { //참가자
@@ -141,9 +140,10 @@ public class Main {
                         int willMoveDist = getDistance(ty, tx); //이동했을 때의 위치에서 출구까지의 거리
                         if (willMoveDist > curDist) continue;
 
-                        ++distSum;
+
                         moveFlag = true;
                         while (!map[i][j].isEmpty()) {
+                            ++distSum;
                             int pNumber = map[i][j].poll();
                             if (willMoveDist == 0) M--;         //이동할 곳이 출구 라면
                             else copyMap[ty][tx].add(pNumber);  //현재 출구 거리보다 이동했을 때의 출구 거리가 더 작으면
