@@ -94,7 +94,7 @@ public class Main {
 //                        System.out.println("AFTER = " + wall.t + ", " + wall.r + ", " + wall.c);
                         if (wall.t == 5) {
                             if (invalidRangePlane(wall.r, wall.c) || visitedPlan[wall.r][wall.c] || (map[wall.r][wall.c] == -1 || map[wall.r][wall.c] == 1)) continue;
-                            if (map[tr][tc] == 4) return turn;
+                            if (map[wall.r][wall.c] == 4) return turn;
                             visitedPlan[wall.r][wall.c] = true;
                             q.add(new TimeMachine(wall.r, wall.c));
                         } else {
