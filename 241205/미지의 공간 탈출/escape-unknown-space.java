@@ -140,7 +140,7 @@ public class Main {
 
     public static Wall getWillMovePlane(int t, int r, int c) {
         if (0 <= r && r < M && 0 <= c && c < M) return new Wall(t, r, c);
-
+//        System.out.println("BEFORE = " + t + ", " + r + ", " + c);
         // 0: 동, 1: 서, 2: 남, 3: 북, 4: 윗면, 5: 평면
         switch (t) {
             case 0:
@@ -150,7 +150,7 @@ public class Main {
                 else if (c >= M) return new Wall(3, r, 0);
                 break;
             case 1:
-                if (r < 0) return new Wall(4, c, r);
+                if (r < 0) return new Wall(4, c, 0);
                 else if (r >= M) return new Wall(5, wallP.r + c, wallP.c - 1);
                 else if (c < 0) return new Wall(3, r, M - 1);
                 else if (c >= M) return new Wall(2, r, 0);
