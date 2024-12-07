@@ -134,7 +134,7 @@ public class Main {
 
             int distance = medusa.getDistance(tr, tc);
             if (distance >= curDistance) continue;
-            pq.add(new MoveInfo(distance, i % 4));
+            pq.add(new MoveInfo(distance, i));
         }
 
         if (!pq.isEmpty()) {
