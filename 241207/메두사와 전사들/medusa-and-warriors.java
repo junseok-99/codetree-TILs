@@ -60,6 +60,10 @@ public class Main {
                 break;
             }
 
+//            for (int i = 0; i < N; i++) {
+//                System.out.println(Arrays.toString(warriorMap[i]));
+//            }System.out.println();
+
             //2. 메두사의 시선
             makeWarriorToStone();
 
@@ -71,12 +75,14 @@ public class Main {
             //3. 전사들의 이동
             moveWarriories();
 
+
+
             sb.append(answer[0]).append(' ').append(answer[1]).append(' ').append(answer[2]).append('\n');
         }
 
-        // for (int i = 0; i < N; i++) {
-        //     System.out.println(Arrays.toString(warriorMap[i]));
-        // }System.out.println();
+//         for (int i = 0; i < N; i++) {
+//             System.out.println(Arrays.toString(warriorMap[i]));
+//         }System.out.println();
         System.out.println(sb);
     }
 
@@ -113,15 +119,16 @@ public class Main {
             MoveInfo moveInfo = pq.poll();
             int tr = r + d[moveInfo.dir][0];
             int tc = c + d[moveInfo.dir][1];
-            answer[0] += warriorMap[r][c];
+            answer[0]++;
+            warriorMap[r][c]--;
             if (medusa.isSamePos(tr, tc)) {
-                answer[2] += warriorMap[r][c];
+                answer[2]++;
                 return;
             }
-            newWarriorMap[tr][tc] += warriorMap[r][c];
+            newWarriorMap[tr][tc]++;
             r = tr;
             c = tc;
-        } else newWarriorMap[r][c] += warriorMap[r][c];
+        } else newWarriorMap[r][c]++;
         pq.clear();
 
         curDistance = medusa.getDistance(r, c);
@@ -141,14 +148,16 @@ public class Main {
             MoveInfo moveInfo = pq.poll();
             int tr = r + d[moveInfo.dir % 4][0];
             int tc = c + d[moveInfo.dir % 4][1];
-            answer[0] += newWarriorMap[r][c];
+            answer[0]++;
+            newWarriorMap[r][c]--;
             if (medusa.isSamePos(tr, tc)) {
-                answer[2] += newWarriorMap[r][c];
-                newWarriorMap[r][c] = 0;
+//                for (int i = 0; i < N; i++) {
+//                    System.out.println(Arrays.toString(newWarriorMap[i]));
+//                }System.out.println();
+                answer[2]++;
                 return;
             }
-            newWarriorMap[tr][tc] += newWarriorMap[r][c];
-            newWarriorMap[r][c] = 0;
+            newWarriorMap[tr][tc]++;
         }
     }
 
@@ -204,8 +213,8 @@ public class Main {
                 }
             }
         } else if (dir <= 3) {
-            for (int i = 0; i < N; i++) {
-                for (int j = medusa.getC(); 0 <= j && j < N; j += d[dir][1]) {
+            for (int j = medusa.getC(); 0 <= j && j < N; j += d[dir][1]) {
+                for (int i = 0; i < N; i++) {
                     if (visionMap[i][j] == 1 && warriorMap[i][j] > 0) {
                         int depth = 1;
                         stonedCount++;
