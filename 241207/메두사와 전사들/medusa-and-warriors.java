@@ -7,7 +7,7 @@ public class Main {
     static int M;
     static Medusa medusa;
     static Pos parkPos;
-    // static List<Warrior> warriorList;
+    static List<Warrior> warriorList;
     static int[][] map;
     static int[][] warriorMap;
     static int[][] d = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -27,13 +27,13 @@ public class Main {
         medusa = new Medusa(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), -1);
         parkPos = new Pos(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
 
-        // warriorList = new ArrayList<>();
+        warriorList = new ArrayList<>();
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < M; i++) {
             int r = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
             warriorMap[r][c]++;
-            // warriorList.add(new Warrior(r, c));
+            warriorList.add(new Warrior(r, c));
         }
 
         for (int i = 0; i < N; i++) {
@@ -88,26 +88,33 @@ public class Main {
 
     public static void moveWarriories() {
         int[][] newWarriorMap = new int[N][N];
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                if (warriorMap[i][j] > 0 && medusa.getVisionState(i, j) != 2) {
-                    moveWarrior(i, j, newWarriorMap);
-                } else if (warriorMap[i][j] > 0 && medusa.getVisionState(i, j) == 2) {
-                    newWarriorMap[i][j] += warriorMap[i][j];
-                }
+        for (Warrior warrior : warriorList) {
+            if (!warrior.isLive) continue;
+            if (medusa.getVisionState(warrior.r, warrior.c) != 2) {
+                moveWarrior(warrior, newWarriorMap);
             }
+            newWarriorMap[warrior.r][warrior.c]++;
         }
+//        for (int i = 0; i < N; i++) {
+//            for (int j = 0; j < N; j++) {
+//                if (warriorMap[i][j] > 0 && medusa.getVisionState(i, j) != 2) {
+//                    moveWarrior(i, j, newWarriorMap);
+//                } else if (warriorMap[i][j] > 0 && medusa.getVisionState(i, j) == 2) {
+//                    newWarriorMap[i][j]++;
+//                }
+//            }
+//        }
         warriorMap = newWarriorMap;
     }
 
-    public static void moveWarrior(int r, int c, int[][] newWarriorMap) {
+    public static void moveWarrior(Warrior warrior, int[][] newWarriorMap) {
         PriorityQueue<MoveInfo> pq = new PriorityQueue<>();
-        int curDistance = medusa.getDistance(r, c);
+        int curDistance = medusa.getDistance(warrior.r, warrior.c);
 
         //첫 번째 이동
         for (int i = 0; i < 4; i++) {
-            int tr = r + d[i][0];
-            int tc = c + d[i][1];
+            int tr = warrior.r + d[i][0];
+            int tc = warrior.c + d[i][1];
 
             if (invalidRange(tr, tc) || medusa.getVisionState(tr, tc) == 1 || medusa.getVisionState(tr, tc) == 2) continue;
 
@@ -117,25 +124,23 @@ public class Main {
         }
         if (!pq.isEmpty()) {
             MoveInfo moveInfo = pq.poll();
-            int tr = r + d[moveInfo.dir][0];
-            int tc = c + d[moveInfo.dir][1];
+            int tr = warrior.r + d[moveInfo.dir][0];
+            int tc = warrior.c + d[moveInfo.dir][1];
             answer[0]++;
-            warriorMap[r][c]--;
+            warrior.setPos(tr, tc);
             if (medusa.isSamePos(tr, tc)) {
                 answer[2]++;
+                warrior.dead();
                 return;
             }
-            newWarriorMap[tr][tc]++;
-            r = tr;
-            c = tc;
-        } else newWarriorMap[r][c]++;
+        }
         pq.clear();
 
-        curDistance = medusa.getDistance(r, c);
+        curDistance = medusa.getDistance(warrior.r, warrior.c);
         //두 번째 이동
         for (int i = 2; i < 6; i++) {
-            int tr = r + d[i % 4][0];
-            int tc = c + d[i % 4][1];
+            int tr = warrior.r + d[i % 4][0];
+            int tc = warrior.c + d[i % 4][1];
 
             if (invalidRange(tr, tc) || medusa.getVisionState(tr, tc) == 1 || medusa.getVisionState(tr, tc) == 2) continue;
 
@@ -146,18 +151,14 @@ public class Main {
 
         if (!pq.isEmpty()) {
             MoveInfo moveInfo = pq.poll();
-            int tr = r + d[moveInfo.dir % 4][0];
-            int tc = c + d[moveInfo.dir % 4][1];
+            int tr = warrior.r + d[moveInfo.dir % 4][0];
+            int tc = warrior.c + d[moveInfo.dir % 4][1];
             answer[0]++;
-            newWarriorMap[r][c]--;
+            warrior.setPos(tr, tc);
             if (medusa.isSamePos(tr, tc)) {
-//                for (int i = 0; i < N; i++) {
-//                    System.out.println(Arrays.toString(newWarriorMap[i]));
-//                }System.out.println();
                 answer[2]++;
-                return;
+                warrior.dead();
             }
-            newWarriorMap[tr][tc]++;
         }
     }
 
@@ -376,6 +377,33 @@ class Medusa {
 
     public void setVisionMap(int[][] visionMap) {
         this.visionMap = visionMap;
+    }
+}
+
+class Warrior {
+    int r;
+    int c;
+    boolean isLive;
+
+    public Warrior(int r, int c) {
+        this.r = r;
+        this.c = c;
+        this.isLive = true;
+    }
+
+    public Warrior(int r, int c, boolean isLive) {
+        this.r = r;
+        this.c = c;
+        this.isLive = isLive;
+    }
+
+    public void setPos(int r, int c) {
+        this.r = r;
+        this.c = c;
+    }
+
+    public void dead() {
+        this.isLive = false;
     }
 }
 
