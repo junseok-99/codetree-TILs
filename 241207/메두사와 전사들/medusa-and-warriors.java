@@ -194,6 +194,7 @@ public class Main {
         int stonedCount = 0;
         int sideDir = 0;
 //        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+//        System.out.println(dir);
         if (dir <= 1) {
             for (int i = medusa.getR() + d[dir][0]; 0 <= i && i < N; i += d[dir][0]) {
                 for (int j = 0; j < N; j++) {
@@ -227,7 +228,14 @@ public class Main {
                 }
             }
         } else if (dir <= 3) {
-            for (int j = medusa.getC() + d[dir][1]; 0 <= j && j < N; j++) {
+            if (dir == 2) {
+//                System.out.println("!!!");
+//                for (int i = 0; i < N; i++) {
+//                    System.out.println(Arrays.toString(visionMap[i]));
+//                }
+//                System.out.println("!!!");
+            }
+            for (int j = medusa.getC() + d[dir][1]; 0 <= j && j < N; j+= d[dir][1]) {
                 for (int i = 0; i < N; i++) {
                     if (visionMap[i][j] == 1 && warriorMap[i][j] > 0) {
 //                        System.out.println("STONE WARRIOR = " + i + ", " + j);
