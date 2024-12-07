@@ -91,9 +91,9 @@ public class Main {
         for (Warrior warrior : warriorList) {
             if (!warrior.isLive) continue;
             if (medusa.getVisionState(warrior.r, warrior.c) != 2) {
-                moveWarrior(warrior, newWarriorMap);
+                moveWarrior(warrior);
             }
-            newWarriorMap[warrior.r][warrior.c]++;
+            if (warrior.isLive) newWarriorMap[warrior.r][warrior.c]++;
         }
 //        for (int i = 0; i < N; i++) {
 //            for (int j = 0; j < N; j++) {
@@ -104,10 +104,14 @@ public class Main {
 //                }
 //            }
 //        }
+//        for (int i = 0; i < N; i++) {
+//            System.out.println(Arrays.toString(newWarriorMap[i]));
+//        }
+//        System.out.println();
         warriorMap = newWarriorMap;
     }
 
-    public static void moveWarrior(Warrior warrior, int[][] newWarriorMap) {
+    public static void moveWarrior(Warrior warrior) {
         PriorityQueue<MoveInfo> pq = new PriorityQueue<>();
         int curDistance = medusa.getDistance(warrior.r, warrior.c);
 
@@ -169,25 +173,34 @@ public class Main {
             int stonedCount = getStonedWarrior(visionMap, i);
             pq.add(new VisionInfo(visionMap, stonedCount, i));
         }
+//        System.out.println(medusa.getR() +", " + medusa.getC());
+
         VisionInfo visionInfo = pq.poll();
         medusa.setVisionMap(visionInfo.visionMap);
         answer[1] = visionInfo.stonedCount;
 
-        // for (int i = 0; i < N; i++) {
-        //     System.out.println(Arrays.toString(visionInfo.visionMap[i]));
-        // }System.out.println(visionInfo.stonedCount);
+//        System.out.println(medusa.getR() + ", " + medusa.getC());
+//         for (int i = 0; i < N; i++) {
+//             System.out.println(Arrays.toString(visionInfo.visionMap[i]));
+//         }System.out.println(visionInfo.stonedCount);
+//
+//        System.out.println("-----------------");
+//        for (int i = 0; i < N; i++) {
+//            System.out.println(Arrays.toString(warriorMap[i]));
+//        }System.out.println();
     }
 
     public static int getStonedWarrior(int[][] visionMap, int dir) {
         int stonedCount = 0;
         int sideDir = 0;
-
+//        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         if (dir <= 1) {
-            for (int i = medusa.getR(); 0 <= i && i < N ; i += d[dir][0]) {
+            for (int i = medusa.getR() + d[dir][0]; 0 <= i && i < N; i += d[dir][0]) {
                 for (int j = 0; j < N; j++) {
                     if (visionMap[i][j] == 1 && warriorMap[i][j] > 0) {
+//                        System.out.println("STONE WARRIOR = " + i + ", " + j);
                         int depth = 1;
-                        stonedCount++;
+                        stonedCount += warriorMap[i][j];
                         visionMap[i][j] = 2;
                         if (medusa.getC() == j) {
                             while (true) {
@@ -214,11 +227,12 @@ public class Main {
                 }
             }
         } else if (dir <= 3) {
-            for (int j = medusa.getC(); 0 <= j && j < N; j += d[dir][1]) {
+            for (int j = medusa.getC() + d[dir][1]; 0 <= j && j < N; j++) {
                 for (int i = 0; i < N; i++) {
                     if (visionMap[i][j] == 1 && warriorMap[i][j] > 0) {
+//                        System.out.println("STONE WARRIOR = " + i + ", " + j);
                         int depth = 1;
-                        stonedCount++;
+                        stonedCount += warriorMap[i][j];
                         visionMap[i][j] = 2;
                         if (medusa.getR() == i) {
                             while (true) {
@@ -290,7 +304,6 @@ public class Main {
             if (invalidRange(tr, tc) || map[tr][tc] == 1) continue;
 
             int distance = getMinimumParkDistance(tr, tc);
-            // System.out.println(curDistance + " | " + distance);
             if (distance > curDistance) continue;
             pq.add(new MoveInfo(distance, i));
         }
@@ -300,6 +313,9 @@ public class Main {
 
         if (warriorMap[medusa.getR()][medusa.getC()] > 0) {
             warriorMap[medusa.getR()][medusa.getC()] = 0;
+        }
+        for (Warrior warrior : warriorList) {
+            if (warrior.r == medusa.getR() && warrior.c == medusa.getC()) warrior.dead();
         }
     }
 
