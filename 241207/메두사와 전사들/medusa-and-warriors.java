@@ -139,8 +139,8 @@ public class Main {
 
         if (!pq.isEmpty()) {
             MoveInfo moveInfo = pq.poll();
-            int tr = r + d[moveInfo.dir][0];
-            int tc = c + d[moveInfo.dir][1];
+            int tr = r + d[moveInfo.dir % 4][0];
+            int tc = c + d[moveInfo.dir % 4][1];
             answer[0] += newWarriorMap[r][c];
             if (medusa.isSamePos(tr, tc)) {
                 answer[2] += newWarriorMap[r][c];
